@@ -8,8 +8,8 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    enum Operation {ADD, SUB, MUL, DIV};
-    Operation op;
+    enum Operation {ADD, SUB, MUL, DIV, NONE};
+    Operation op = Operation.NONE;
 
     boolean isDecimal = false;
 
@@ -106,8 +106,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             field.setText(field.getText() + "8");
         if (view.getId() == R.id.num9)
             field.setText(field.getText() + "9");
-        if (view.getId() == R.id.clear)
-            field.setText("");
+        if (view.getId() == R.id.clear) {
+            clearField();
+            result.setText("");
+        }
         if (view.getId() == R.id.back) {
             CharSequence seq = field.getText();
             if (seq.length() > 0) {
@@ -119,25 +121,92 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view.getId() == R.id.dec) {
             if (!isDecimal) {
                 field.setText(field.getText()+".");
+                isDecimal = true;
             }
         }
-
-
-        if (view.getId() == R.id.add) {
+        if (view.getId() == R.id.add)
+            opPressed(Operation.ADD);
+        if (view.getId() == R.id.sub)
+            opPressed(Operation.SUB);
+        if (view.getId() == R.id.mult)
+            opPressed(Operation.MUL);
+        if (view.getId() == R.id.div)
+            opPressed(Operation.DIV);
+        if (view.getId() == R.id.equal) {
+            if (isFieldEmpty() || isResultEmpty());
+            else {
+                double x = Double.parseDouble(result.getText().toString());
+                double y = Double.parseDouble(field.getText().toString());
+                switch (op) {
+                    case ADD:
+                        x += y;
+                        break;
+                    case SUB:
+                        x -= y;
+                        break;
+                    case MUL:
+                        x *= y;
+                        break;
+                    case DIV:
+                        x /= y;
+                        break;
+                }
+                result.setText(x + "");
+                clearField();
+                op = Operation.NONE;
+            }
 
         }
-        if (view.getId() == R.id.sub) {
-
-        }
-        if (view.getId() == R.id.mult) {
-
-        }
-        if (view.getId() == R.id.div) {
-
-        }
-
 
     }
 
+    private void opPressed(Operation opie) {
+        if (isFieldEmpty())      // No second operand, do nothing
+            return;
+        if (isResultEmpty()) {   // No first operand
+            result.setText(field.getText());
+            clearField();
+        }
+        else {
+            double x = Double.parseDouble(result.getText().toString());
+            double y = Double.parseDouble(field.getText().toString());
+            switch (op) {
+                case ADD:
+                    x += y;
+                    break;
+                case SUB:
+                    x -= y;
+                    break;
+                case MUL:
+                    x *= y;
+                    break;
+                case DIV:
+                    x /= y;
+                    break;
+                default:
+                    x = y;
+                    break;
+            }
+            result.setText(x + "");
+            clearField();
+        }
+        op = opie;
+    }
 
+    private void clearField() {
+        field.setText("");
+        isDecimal = false;
+    }
+
+    private boolean isFieldEmpty() {
+        if (field.getText().length() == 0)
+            return true;
+        else return false;
+    }
+
+    private boolean isResultEmpty() {
+        if (result.getText().length() == 0)
+            return true;
+        else return false;
+    }
 }
