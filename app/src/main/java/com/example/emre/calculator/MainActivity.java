@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -84,33 +85,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(View v) {
 
-        if (view.getId() == R.id.num0)
+        if (v.getId() == R.id.num0)
             field.setText(field.getText() + "0");
-        if (view.getId() == R.id.num1)
+        if (v.getId() == R.id.num1)
             field.setText(field.getText() + "1");
-        if (view.getId() == R.id.num2)
+        if (v.getId() == R.id.num2)
             field.setText(field.getText() + "2");
-        if (view.getId() == R.id.num3)
+        if (v.getId() == R.id.num3)
             field.setText(field.getText() + "3");
-        if (view.getId() == R.id.num4)
+        if (v.getId() == R.id.num4)
             field.setText(field.getText() + "4");
-        if (view.getId() == R.id.num5)
+        if (v.getId() == R.id.num5)
             field.setText(field.getText() + "5");
-        if (view.getId() == R.id.num6)
+        if (v.getId() == R.id.num6)
             field.setText(field.getText() + "6");
-        if (view.getId() == R.id.num7)
+        if (v.getId() == R.id.num7)
             field.setText(field.getText() + "7");
-        if (view.getId() == R.id.num8)
+        if (v.getId() == R.id.num8)
             field.setText(field.getText() + "8");
-        if (view.getId() == R.id.num9)
+        if (v.getId() == R.id.num9)
             field.setText(field.getText() + "9");
-        if (view.getId() == R.id.clear) {
+        if (v.getId() == R.id.clear) {
             clearField();
             result.setText("");
         }
-        if (view.getId() == R.id.back) {
+        if (v.getId() == R.id.back) {
             CharSequence seq = field.getText();
             if (seq.length() > 0) {
                 if (seq.charAt(seq.length() - 1) == '.')
@@ -118,21 +119,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 field.setText(seq.subSequence(0, seq.length() - 1));
             }
         }
-        if (view.getId() == R.id.dec) {
+        if (v.getId() == R.id.dec) {
             if (!isDecimal) {
                 field.setText(field.getText()+".");
                 isDecimal = true;
             }
         }
-        if (view.getId() == R.id.add)
+        if (v.getId() == R.id.add)
             opPressed(Operation.ADD);
-        if (view.getId() == R.id.sub)
+        if (v.getId() == R.id.sub)
             opPressed(Operation.SUB);
-        if (view.getId() == R.id.mult)
+        if (v.getId() == R.id.mult)
             opPressed(Operation.MUL);
-        if (view.getId() == R.id.div)
+        if (v.getId() == R.id.div)
             opPressed(Operation.DIV);
-        if (view.getId() == R.id.equal) {
+        if (v.getId() == R.id.equal) {
             if (isFieldEmpty() || isResultEmpty());
             else {
                 double x = Double.parseDouble(result.getText().toString());
@@ -148,10 +149,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         x *= y;
                         break;
                     case DIV:
-                        x /= y;
+                        if (y == 0) {
+                            Toast.makeText(MainActivity.this, "Divide by zero exception", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                            x /= y;
                         break;
                 }
-                result.setText(x + "");
+                result.setText(clearUselessFractionalPart(x));
                 clearField();
                 op = Operation.NONE;
             }
@@ -160,12 +165,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    // Called when + - * or / is pressed. First the stored operation is executed, and then the operation representing the
+    // newly pressed button is stored.
     private void opPressed(Operation opie) {
-        if (isFieldEmpty())      // No second operand, do nothing
-            return;
-        if (isResultEmpty()) {   // No first operand
+        if (isFieldEmpty()) {       // No second operand, only chnage the operation state
+            op = opie;
+        }
+        else if (isResultEmpty()) {   // No first operand, shift the second operand into the first operand slot
             result.setText(field.getText());
             clearField();
+            op = opie;
         }
         else {
             double x = Double.parseDouble(result.getText().toString());
@@ -187,10 +196,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     x = y;
                     break;
             }
-            result.setText(x + "");
+            result.setText(clearUselessFractionalPart(x));
             clearField();
+            op = opie;
         }
-        op = opie;
     }
 
     private void clearField() {
@@ -208,5 +217,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (result.getText().length() == 0)
             return true;
         else return false;
+    }
+
+    private CharSequence clearUselessFractionalPart(double x) {
+        CharSequence ex = x + "";
+        if (ex.length() < 2) return ex;
+
+        if (ex.charAt(ex.length() - 1) == '0' && ex.charAt(ex.length() - 2) == '.')
+            return ex.subSequence(0, ex.length() - 2);
+        else return ex;
     }
 }

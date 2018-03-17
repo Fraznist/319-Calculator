@@ -210,9 +210,11 @@
         android:layout_alignStart="@+id/back"
         android:layout_marginBottom="18dp"
         android:ems="10"
+        android:gravity="end"
         android:inputType="textPersonName"
+        android:paddingRight="18sp"
         android:textAlignment="textEnd"
-        android:gravity="end" />
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/result"
@@ -225,8 +227,10 @@
         android:layout_alignStart="@+id/field"
         android:layout_marginBottom="13dp"
         android:ems="10"
+        android:gravity="end"
         android:inputType="textPersonName"
+        android:paddingRight="18sp"
         android:textAlignment="textEnd"
-        android:gravity="end" />
+        android:textSize="22sp" />
 
 </RelativeLayout>
