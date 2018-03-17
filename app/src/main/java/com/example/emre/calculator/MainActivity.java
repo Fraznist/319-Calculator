@@ -190,14 +190,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     x *= y;
                     break;
                 case DIV:
-                    x /= y;
-                    break;
-                default:
                     if (y == 0) {
                         Toast.makeText(MainActivity.this, "Divide by zero exception", Toast.LENGTH_SHORT).show();
                     }
                     else
                         x /= y;
+                    break;
+                default:
+                    x = y;
                     break;
             }
             result.setText(clearUselessFractionalPart(x));
